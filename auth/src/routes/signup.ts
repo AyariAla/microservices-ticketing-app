@@ -1,9 +1,13 @@
 import express, { Response, Request } from 'express';
 import { body, validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+
 import { RequestValidationError } from '../errors/request-validation-error';
 import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/user';
-import jwt from 'jsonwebtoken';
+
+import Cookie from 'cookies';
+
 const router = express.Router();
 
 router.post(
@@ -34,21 +38,18 @@ router.post(
       password,
     });
     await user.save();
-    // Generating JWT
+
+    // Generate JWT
     const userJwt = jwt.sign(
       {
         id: user.id,
         email: user.email,
       },
-      'asdf'
+      // ! this variable is 100% defined
+      process.env.JWT_KEY!
     );
-    // Storing in on the session obj
-    // req.session = {
-    //   jwt: userJwt,
-    // };
-    // console.log(req.session);
 
-    res.status(201).send(user);
+    res.status(201).send(userJwt);
   }
 );
 
