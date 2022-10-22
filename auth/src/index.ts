@@ -10,9 +10,22 @@ import { signoutRouter } from './routes/singout';
 import { errorHandler } from './middlewares/errror-handler';
 import { NotFoundError } from './errors/not-found-error';
 
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import cookieSession from 'cookie-session';
 const app = express();
 // traffic is being proxied to the app through ingress nginx and express will not trust the connection because of the proxy
 app.set('trust proxy', 1);
+app.use(
+  cookieSession({
+    name: 'session',
+    signed: false,
+    secure: false,
+  })
+);
+
+app.use(cookieParser());
+
 app.use(json());
 app.use(currentUserRouter);
 app.use(signinRouter);

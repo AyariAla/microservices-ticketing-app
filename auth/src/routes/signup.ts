@@ -1,13 +1,33 @@
 import express, { Response, Request } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
-import { RequestValidationError } from '../errors/request-validation-error';
 import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/user';
+import { validateRequest } from '../middlewares/validate-requests';
+import { Session } from 'express-session';
 
-import Cookie from 'cookies';
+// declare global {
+//   namespace Express {
+//     interface SessionData {
+//       jwt?: string;
+//     }
+//   }
+// }
+// declare module 'express-session' {
+//   interface SessionData {
+//     jwt?: string;
+//   }
+// }
 
+// declare module 'express-session' {
+//   interface SessionData {
+//     user: { [key: string]: any };
+//   }
+// }
+export interface ISession extends Session {
+  jwt?: string;
+}
 const router = express.Router();
 
 router.post(
@@ -20,12 +40,14 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage('Password must between 4 and 20 characters'),
   ],
+  // add validation request after doing the checks
+  validateRequest,
   //   validationResult inspects the request because there will be stuff appended to it
   async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new RequestValidationError(errors.array());
-    }
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   throw new RequestValidationError(errors.array());
+    // }
     const { email, password } = req.body;
     // if not existingUser will be null
     const existingUser = await User.findOne({ email });
@@ -46,10 +68,14 @@ router.post(
         email: user.email,
       },
       // ! this variable is 100% defined
-      process.env.JWT_KEY!
+      process.env.JWT_KEY!,
+      { expiresIn: '1h' }
     );
 
-    res.status(201).send(userJwt);
+    (req.session as ISession).jwt = userJwt;
+    res.status(201).send({
+      user: user,
+    });
   }
 );
 
