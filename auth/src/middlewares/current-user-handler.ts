@@ -2,19 +2,20 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { ISession } from '../types/ISession';
+import { IUserPayload } from '../types/IUserPayload';
 
-interface UserPayload {
-  id: string;
-  email: string;
-}
+// interface UserPayload {
+//   id: string;
+//   email: string;
+// }
 
-declare global {
-  namespace Express {
-    interface Request {
-      currentUser?: UserPayload;
-    }
-  }
-}
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       currentUser?: UserPayload;
+//     }
+//   }
+// }
 export const currentuserHandler = (
   req: Request,
   res: Response,
@@ -28,7 +29,7 @@ export const currentuserHandler = (
   try {
     // const payload = jwt.verify(token[1], process.env.JWT_KEY!) as UserPayload;
     const token = (req.session as ISession).jwt;
-    const payload = jwt.verify(token, process.env.JWT_KEY!) as UserPayload;
+    const payload = jwt.verify(token, process.env.JWT_KEY!) as IUserPayload;
 
     req.currentUser = payload;
   } catch (error) {
