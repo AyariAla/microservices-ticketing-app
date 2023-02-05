@@ -2,9 +2,10 @@ import express, { Response, Request } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
-import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/user';
-import { validateRequest } from '../middlewares/validate-requests';
+// import { BadRequestError } from '../errors/bad-request-error';
+// import { validateRequest } from '../middlewares/validate-requests';
+import { BadRequestError, validateRequest } from '@alaaytickets/common';
 import { Session } from 'express-session';
 
 // declare global {

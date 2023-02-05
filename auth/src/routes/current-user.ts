@@ -1,5 +1,7 @@
 import express from 'express';
-import { currentuserHandler } from '../middlewares/current-user-handler';
+// import { currentuserHandler } from '../middlewares/current-user-handler';
+// Before publishing common package
+import { currentuserHandler } from '@alaaytickets/common';
 
 const router = express.Router();
 

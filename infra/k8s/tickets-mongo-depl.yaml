@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      #how to find the pods
+      app: tickets-mongo
+  template:
+    metadata:
+      labels:
+        #label to be applied to pod
+        app: tickets-mongo
+    spec:
+      containers:
+        - name: tickets-mongo
+          image: mongo:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-mongo-srv
+spec:
+  selector:
+    app: tickets-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      #default mongodb PORT
+      port: 27017
+      targetPort: 27017
